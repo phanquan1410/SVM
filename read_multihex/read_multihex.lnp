@@ -1,0 +1,17 @@
+--cpu=Cortex-M4.fp.sp
+".\stm32f30x_adc.o"
+".\stm32f30x_gpio.o"
+".\stm32f30x_misc.o"
+".\stm32f30x_rcc.o"
+".\stm32f30x_syscfg.o"
+".\stm32f30x_tim.o"
+".\stm32f30x_usart.o"
+".\system_stm32f30x.o"
+".\startup_stm32f334x8.o"
+".\stm32f30x_it.o"
+".\systick_delay.o"
+".\main.o"
+--strict --scatter ".\read_multihex.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\read_multihex.map" -o .\read_multihex.axf
