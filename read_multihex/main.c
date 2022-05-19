@@ -1,41 +1,44 @@
+   
  #include "main.h"
  #include "stdio.h"
- #include <stdint.h>
+// #include <stdint.h>
  #include <string.h>
+// #include <limits.h> 
+ #include <stdlib.h>
 
 
-void TIM7_Config(void)
-{
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
-	
-	NVIC_InitTypeDef NVIC_InitStructure;
-	
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
-	
-	TIM_TimeBaseInitStructure.TIM_Prescaler = 63;
-	TIM_TimeBaseInitStructure.TIM_Period = 999;
-	TIM_TimeBaseInitStructure.TIM_RepetitionCounter = 0;
-	TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_TimeBaseInit(TIM7, &TIM_TimeBaseInitStructure);
-	
-	TIM_Cmd(TIM7, ENABLE);
-	TIM_ClearFlag(TIM7, TIM_FLAG_Update);
-	TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);
-  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
-	
-	NVIC_InitStructure.NVIC_IRQChannel = TIM7_DAC2_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority= 1;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
-	
-	TIM_SetCounter(TIM7, 0);
-	SET_BIT(TIM7->EGR, TIM_EGR_UG);                    //Update registers when compleate setup
-	SET_BIT(TIM7->CR1, TIM_CR1_CEN);                   //Enable counter clock
-} 
-////////////////////////////////////////////////// 
- 
+//void TIM7_Config(void)
+//{
+//	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
+//	
+//	NVIC_InitTypeDef NVIC_InitStructure;
+//	
+//	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
+//	
+//	TIM_TimeBaseInitStructure.TIM_Prescaler = 63;
+//	TIM_TimeBaseInitStructure.TIM_Period = 999;
+//	TIM_TimeBaseInitStructure.TIM_RepetitionCounter = 0;
+//	TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+//	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
+//	TIM_TimeBaseInit(TIM7, &TIM_TimeBaseInitStructure);
+//	
+//	TIM_Cmd(TIM7, ENABLE);
+//	TIM_ClearFlag(TIM7, TIM_FLAG_Update);
+//	TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);
+//  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+//	
+//	NVIC_InitStructure.NVIC_IRQChannel = TIM7_DAC2_IRQn;
+//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority= 1;
+//	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//	NVIC_Init(&NVIC_InitStructure);
+//	
+//	TIM_SetCounter(TIM7, 0);
+//	SET_BIT(TIM7->EGR, TIM_EGR_UG);                    //Update registers when compleate setup
+//	SET_BIT(TIM7->CR1, TIM_CR1_CEN);                   //Enable counter clock
+//} 
+//////////////////////////////////////////////////// 
+// 
 void UART2_Configure(void)
 	{
 	// define configuration
@@ -117,24 +120,66 @@ void USART2_IRQHandler(void)
 /////////////////////////////////////////////////////////
 
 ///////////////nivc timer//////////
-uint16_t x=0; 
-void TIM7_DAC2_IRQHandler(void)
-{
-	if(TIM_GetITStatus(TIM7, TIM_IT_Update) != 0)
-   {
-		 
-		TIM_ClearITPendingBit(TIM7 , TIM_IT_Update);	
-		x++;
-   }
-}
+//uint16_t x=0; 
+//void TIM7_DAC2_IRQHandler(void)
+//{
+//	if(TIM_GetITStatus(TIM7, TIM_IT_Update) != 0)
+//   {
+//		 
+//		TIM_ClearITPendingBit(TIM7 , TIM_IT_Update);	
+//		x++;
+//   }
+//}
 
 /////////////////////////////////
+
+/////////
+//int myAtoi(const char* str)
+//{
+//    int sign = 1, base = 0, i = 0;    
+//    // if whitespaces then ignore.
+//    while (str[i] == ' ')
+//    {
+//      i++;
+//    }    
+//    // sign of number
+//    if (str[i] == '-' || str[i] == '+')
+//    {
+//      sign = 1 - 2 * (str[i++] == '-');
+//    }   
+//    // checking for valid input
+//    while (str[i] >= '0' && str[i] <= '9')
+//    {
+//        // handling overflow test case
+//      if (base > INT_MAX / 10
+//         || (base == INT_MAX / 10
+//          && str[i] - '0' > 7))
+//      {
+//        if (sign == 1)
+//				{
+//          return INT_MAX;
+//        }
+//				else
+//				{
+//          return INT_MIN;
+//        }
+//        base = 10 * base + (str[i++] - '0');
+//			}
+//    return base * sign;
+//		}
+//	}
+
+/////////
+
+
+
 int main(void)
  {
-	char *msg;
-	char *msg1;
-	
-  
+	char msg[100];
+	char msg1[100];
+	int tem_now = 20;
+  int t = 0;
+	uint8_t value = 0;
 	uint16_t e;
 	uint8_t Done = 0; 
 	//TIM7_Config();
@@ -195,10 +240,28 @@ int main(void)
 				}
 				if(Data_USART2[3] == 0xCF)
 				{
-					UART_SendString(USART2," set temperature code right \n");
-					sprintf(msg,"temperature: %d \n", Data_USART2[5]);
+					sprintf(msg,"%d", Data_USART2[5]);
 					UART_SendString(USART2,msg);
-					for (i=0;i<8;i++){
+					t = atoi(msg);
+					while( tem_now > t)
+					{
+						tem_now -- ;
+					}
+					
+					while(tem_now < t )
+					{
+						tem_now ++ ;
+					}
+			
+					if (tem_now == t )
+					{
+						sprintf(msg,"temperature: %d \n", tem_now);
+						UART_SendString(USART2,msg);
+					}else{
+						UART_SendString(USART2," something wrong \n");
+					}
+
+				for (i=0;i<8;i++){
 						Data_USART2[i] = 0;
 					}
 					if (count == 8)
@@ -209,9 +272,12 @@ int main(void)
 				}
 				if(Data_USART2[3] == 0xD1)
 				{
-					UART_SendString(USART2," time defrost code right \n");
-					sprintf(msg,"time: %d min\n", Data_USART2[5]);
-					UART_SendString(USART2,msg);
+					if(Data_USART2[5] > 0x00)
+					{
+						UART_SendString(USART2," time defrost code right \n");
+						sprintf(msg,"time: %d min\n", Data_USART2[5]);
+						UART_SendString(USART2,msg);
+					}
 					for (i=0;i<8;i++){
 						Data_USART2[i] = 0;
 					}
@@ -223,9 +289,12 @@ int main(void)
 				}
 				if(Data_USART2[3] == 0xD2)
 				{
-					UART_SendString(USART2," time work code right \n");
-					sprintf(msg,"time: %d min\n", Data_USART2[5]);
-					UART_SendString(USART2,msg);
+					if(Data_USART2[5] > 0x00)
+					{
+						UART_SendString(USART2," time work code right \n");
+						sprintf(msg,"time: %d min\n", Data_USART2[5]);
+						UART_SendString(USART2,msg);
+					}
 					for (i=0;i<8;i++){
 						Data_USART2[i] = 0;
 					}
@@ -237,9 +306,12 @@ int main(void)
 				}
 				if(Data_USART2[3] == 0xD3)
 				{
-					UART_SendString(USART2," time cooler rest code right \n");
-					sprintf(msg,"time: %d min\n", Data_USART2[5]);
-					UART_SendString(USART2,msg);
+					if(Data_USART2[5] > 0x00)
+					{
+						UART_SendString(USART2," time cooler rest code right \n");
+						sprintf(msg,"time: %d min\n", Data_USART2[5]);
+						UART_SendString(USART2,msg);
+					}
 					for (i=0;i<8;i++){
 						Data_USART2[i] = 0;
 					}
@@ -261,8 +333,29 @@ int main(void)
 						Done = 0;
 					}
 				}
-			}		
+			}
+//			if (value == 1)
+//			{
+//				UART_SendString(USART2,"true 1\n");
+//				Delay_ms(1000);
+//				while(tem_now > t){
+//					tem_now = tem_now - 1;
+//				}
+//				sprintf(msg,"set temperature to %d oC\n", tem_now);
+//				UART_SendString(USART2,msg);
+//			}else if(value == 2)
+//			{
+//				UART_SendString(USART2,"true 2\n");
+//				Delay_ms(1000);
+//				while(tem_now < t){
+//					tem_now = tem_now + 1;
+//				}
+//				sprintf(msg,"set temperature to %d oC\n", tem_now);
+//				UART_SendString(USART2,msg);
+//			}else{
+//			 UART_SendString(USART2,"wrong\n");
+//				Delay_ms(1000);
+//			
+//			}
 	}
 }
- 
-
